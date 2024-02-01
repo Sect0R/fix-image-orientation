@@ -1,5 +1,5 @@
 <?php
-function static fixImageOrientation( $imagePath, $fixOrientation = true )
+function static fixImageOrientation( $imagePath )
 	{
 		if (!is_readable($imagePath)) {
 			throw new Exception("Cannot read '{$imagePath}' file!");
@@ -35,28 +35,26 @@ function static fixImageOrientation( $imagePath, $fixOrientation = true )
 				break;
 		}
 
-		if ( $fixOrientation ) {
-			if ( $fixOrientationTo && is_writable($imagePath) ) {
+		if ( $fixOrientationTo && is_writable($imagePath) ) {
 
-				Yii::import('ext.EWideImage.EWideImage');
-				$imagePathInfo = pathinfo($imagePath);
+			Yii::import('ext.EWideImage.EWideImage');
+			$imagePathInfo = pathinfo($imagePath);
 
-				if ( empty($imagePathInfo['extension']) || $imagePathInfo['extension'] == 'tmp' )
-				{
-					copy($imagePath, $imagePath.'.jpg');
-					EWideImage::load($imagePath.'.jpg')->rotate($fixOrientationTo)->saveToFile($imagePath.'.jpg');
-					copy($imagePath.'.jpg', $imagePath);
-					unlink($imagePath.'.jpg');
-				}
-				else
-				{
-					EWideImage::load($imagePath)->rotate($fixOrientationTo)->saveToFile($imagePath);
-				}
-
-
-			} elseif ( !is_writable($imagePath) ) {
-				throw new Exception("Cannot write '{$imagePath}' file!");
+			if ( empty($imagePathInfo['extension']) || $imagePathInfo['extension'] == 'tmp' )
+			{
+				copy($imagePath, $imagePath.'.jpg');
+				EWideImage::load($imagePath.'.jpg')->rotate($fixOrientationTo)->saveToFile($imagePath.'.jpg');
+				copy($imagePath.'.jpg', $imagePath);
+				unlink($imagePath.'.jpg');
 			}
+			else
+			{
+				EWideImage::load($imagePath)->rotate($fixOrientationTo)->saveToFile($imagePath);
+			}
+
+
+		} elseif ( !is_writable($imagePath) ) {
+			throw new Exception("Cannot write '{$imagePath}' file!");
 		}
 
 		return $fixOrientationTo;
